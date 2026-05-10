@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router";
 
-
 import HomePage from "./pages/HomePage.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -9,6 +8,9 @@ import NotificationsPage from "./pages/NotificationsPage.jsx";
 import CallPage from "./pages/CallPage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
 import OnboardingPage from "./pages/OnboardingPage.jsx";
+// NAYA IMPORT: Yahan apne naye page ko import karna hai
+import FriendsPage from "./pages/FriendsPage.jsx"; 
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 import { Toaster } from "react-hot-toast";
 
@@ -41,6 +43,21 @@ const App = () => {
             )
           }
         />
+        
+        {/* NAYA ROUTE: Friends page ke liye yahan route add kiya hai */}
+        <Route
+          path="/friends"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <FriendsPage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+            )
+          }
+        />
+
         <Route
           path="/signup"
           element={
@@ -93,7 +110,6 @@ const App = () => {
           path="/onboarding"
           element={
             isAuthenticated ? (
-              
               !isOnboarded ? (
                 <OnboardingPage />
               ) : (
@@ -101,6 +117,19 @@ const App = () => {
               )
             ) : (
               <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated && isOnboarded ? (
+              <Layout showSidebar={true}>
+                <ProfilePage />
+              </Layout>
+            ) : (
+              <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
             )
           }
         />
