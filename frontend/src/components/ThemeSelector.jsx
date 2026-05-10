@@ -74,4 +74,4 @@ const ThemeSelector = () => {
   );
 };
 
-export default ThemeSelector;y
+export default ThemeSelector;
