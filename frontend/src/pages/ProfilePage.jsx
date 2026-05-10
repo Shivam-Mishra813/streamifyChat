@@ -1,111 +1,19 @@
-// import React from 'react';
-// import useAuthUser from '../hooks/useAuthUser';
-// import { Mail, MapPin, User, Edit2 } from 'lucide-react';
-
-// // Language ke hisaab se flag lagane wala function
-// const getFlag = (language) => {
-//   const lang = language?.toLowerCase();
-//   if (lang === "english") return "🇬🇧";
-//   if (lang === "spanish") return "🇪🇸";
-//   if (lang === "hindi") return "🇮🇳";
-//   if (lang === "french") return "🇫🇷";
-//   if (lang === "german") return "🇩🇪";
-//   return "🌍";
-// };
-
-// const ProfilePage = () => {
-//   // Hook se current user ka data nikal liya
-//   const { authUser } = useAuthUser();
-
-//   if (!authUser) return null;
-
-//   return (
-//     <div className="p-4 md:p-8 w-full max-w-4xl mx-auto h-full overflow-y-auto">
-//       <div className="flex justify-between items-center mb-8">
-//         <h1 className="text-2xl md:text-3xl font-bold text-white">My Profile</h1>
-//         {/* Future ke liye Edit button */}
-//         <button className="btn btn-outline btn-sm sm:btn-md gap-2">
-//           <Edit2 className="size-4" />
-//           Edit Profile
-//         </button>
-//       </div>
-
-//       <div className="bg-[#18191c] rounded-2xl p-6 md:p-10 border border-gray-800 shadow-xl">
-//         <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-          
-//           {/* Profile Photo Section */}
-//           <div className="flex flex-col items-center gap-4">
-//             <div className="avatar">
-//               <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-//                 <img 
-//                   src={authUser.profilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${authUser.fullName}`} 
-//                   alt={authUser.fullName} 
-//                 />
-//               </div>
-//             </div>
-//             <span className="badge badge-success gap-2 p-3">
-//               <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-//               Online
-//             </span>
-//           </div>
-
-//           {/* User Details Section */}
-//           <div className="flex-1 space-y-6 w-full">
-//             <div>
-//               <h2 className="text-3xl font-bold text-white mb-2">{authUser.fullName}</h2>
-//               {authUser.bio && <p className="text-gray-400 text-sm">{authUser.bio}</p>}
-//             </div>
-
-//             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-//               {/* Email */}
-//               <div className="flex items-center gap-3 text-gray-300 bg-gray-800/50 p-3 rounded-lg">
-//                 <Mail className="size-5 text-primary" />
-//                 <span>{authUser.email || "Email not provided"}</span>
-//               </div>
-              
-//               {/* Location */}
-//               <div className="flex items-center gap-3 text-gray-300 bg-gray-800/50 p-3 rounded-lg">
-//                 <MapPin className="size-5 text-primary" />
-//                 <span>{authUser.location || "Location not provided"}</span>
-//               </div>
-//             </div>
-
-//             {/* Languages Display */}
-//             <div className="mt-6 border-t border-gray-800 pt-6">
-//               <h3 className="text-lg font-semibold text-white mb-4">Language Preferences</h3>
-//               <div className="flex flex-wrap gap-4">
-//                 <div className="bg-pink-600/20 border border-pink-600 text-pink-500 font-medium px-5 py-3 rounded-xl flex items-center gap-3">
-//                   <span className="text-2xl">{getFlag(authUser.nativeLanguage)}</span>
-//                   <div className="flex flex-col">
-//                     <span className="text-xs opacity-70">Native Language</span>
-//                     <span className="text-white">{authUser.nativeLanguage || "N/A"}</span>
-//                   </div>
-//                 </div>
-                
-//                 <div className="bg-blue-600/20 border border-blue-600 text-blue-500 font-medium px-5 py-3 rounded-xl flex items-center gap-3">
-//                   <span className="text-2xl">{getFlag(authUser.learningLanguage)}</span>
-//                   <div className="flex flex-col">
-//                     <span className="text-xs opacity-70">Learning Language</span>
-//                     <span className="text-white">{authUser.learningLanguage || "N/A"}</span>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ProfilePage;
-
 import React, { useState } from 'react';
 import useAuthUser from '../hooks/useAuthUser';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Mail, MapPin, Edit2, Save, X } from 'lucide-react';
+
+// Language flag helper (Purane code se wapas laya)
+const getFlag = (language) => {
+  const lang = language?.toLowerCase();
+  if (lang === "english") return "🇬🇧";
+  if (lang === "spanish") return "🇪🇸";
+  if (lang === "hindi") return "🇮🇳";
+  if (lang === "french") return "🇫🇷";
+  if (lang === "german") return "🇩🇪";
+  return "🌍";
+};
 
 const ProfilePage = () => {
   const { authUser } = useAuthUser();
@@ -123,84 +31,159 @@ const ProfilePage = () => {
       const res = await axios.put("http://localhost:5001/api/users/update-profile", formData, {
         withCredentials: true
       });
-      toast.success("Profile Updated!");
+      toast.success("Profile Updated Successfully!");
       setIsEditing(false);
       window.location.reload(); // Data refresh karne ke liye
     } catch (error) {
-      toast.error("Update failed!");
+      toast.error("Update failed! Please try again.");
     }
   };
 
   if (!authUser) return null;
 
   return (
-    <div className="p-4 md:p-8 w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-white">My Profile</h1>
+    /* 1. pb-safe & pb-20: Mobile bottom nav ke peeche chhupne se rokne ke liye 
+       2. max-w-4xl: Desktop par proper sizing
+    */
+    <div className="p-4 sm:p-6 md:p-8 w-full max-w-4xl mx-auto pb-safe pb-20 lg:pb-8">
+      
+      {/* PAGE HEADER */}
+      <div className="flex justify-between items-center mb-6 sm:mb-8 border-b border-base-300 pb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-base-content tracking-tight">My Profile</h1>
         
+        {/* Toggle Edit Button */}
         <button 
-          onClick={() => setIsEditing(!isEditing)}
-          className={`btn btn-sm gap-2 ${isEditing ? "btn-error" : "btn-outline"}`}
+          onClick={() => {
+            setIsEditing(!isEditing);
+            // Agar cancel kiya toh form reset kar do
+            if(isEditing) {
+              setFormData({
+                fullName: authUser?.fullName || "",
+                bio: authUser?.bio || "",
+                location: authUser?.location || "",
+              });
+            }
+          }}
+          className={`btn btn-sm sm:btn-md gap-2 transition-all active:scale-95 ${isEditing ? "btn-error text-white" : "btn-outline"}`}
         >
           {isEditing ? <X className="size-4" /> : <Edit2 className="size-4" />}
-          {isEditing ? "Cancel" : "Edit Profile"}
+          <span className="hidden sm:inline">{isEditing ? "Cancel" : "Edit Profile"}</span>
         </button>
       </div>
 
-      <div className="bg-[#18191c] rounded-2xl p-6 md:p-10 border border-gray-800 shadow-xl">
-        <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+      {/* MAIN PROFILE CARD */}
+      <div className="bg-base-200/50 rounded-2xl p-5 sm:p-8 md:p-10 border border-base-300 shadow-xl backdrop-blur-sm">
+        <div className="flex flex-col md:flex-row gap-6 sm:gap-8 items-center md:items-start">
           
-          {/* Profile Pic */}
-          <div className="avatar flex flex-col items-center gap-4">
-            <div className="w-32 rounded-full ring ring-primary ring-offset-2">
-              <img src={authUser.profilePic} alt="profile" />
+          {/* PROFILE PIC SECTION */}
+          <div className="flex flex-col items-center gap-3 sm:gap-4 shrink-0">
+            <div className="avatar">
+              <div className="w-24 sm:w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img 
+                  src={authUser.profilePic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${authUser.fullName}`} 
+                  alt="profile" 
+                  className="object-cover"
+                />
+              </div>
             </div>
-            <div className="badge badge-success gap-2">Online</div>
+            <div className="badge badge-success gap-2 shadow-sm font-medium p-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+              Online
+            </div>
           </div>
 
-          {/* Details Section */}
+          {/* DETAILS & EDIT SECTION */}
           <div className="flex-1 w-full space-y-6">
+            
+            {/* EDIT MODE (FORM) */}
             {isEditing ? (
-              <div className="space-y-4">
-                <input 
-                  className="input input-bordered w-full bg-gray-900 text-white" 
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                  placeholder="Full Name"
-                />
-                <textarea 
-                  className="textarea textarea-bordered w-full bg-gray-900 text-white" 
-                  value={formData.bio}
-                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                  placeholder="Bio (e.g. BB)"
-                />
-                <input 
-                  className="input input-bordered w-full bg-gray-900 text-white" 
-                  value={formData.location}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  placeholder="Location"
-                />
-                <button onClick={handleSave} className="btn btn-primary w-full gap-2">
+              <div className="space-y-4 bg-base-100 p-4 sm:p-6 rounded-xl border border-base-300 shadow-sm">
+                
+                <div className="form-control">
+                  <label className="label px-1"><span className="label-text text-xs font-bold uppercase tracking-wider opacity-60">Full Name</span></label>
+                  <input 
+                    className="input input-bordered w-full focus:border-primary focus:ring-1 focus:ring-primary transition-all" 
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                    placeholder="E.g. John Doe"
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label px-1"><span className="label-text text-xs font-bold uppercase tracking-wider opacity-60">Bio</span></label>
+                  <textarea 
+                    className="textarea textarea-bordered w-full resize-none h-24 focus:border-primary focus:ring-1 focus:ring-primary transition-all" 
+                    value={formData.bio}
+                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                    placeholder="Tell us about yourself..."
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label px-1"><span className="label-text text-xs font-bold uppercase tracking-wider opacity-60">Location</span></label>
+                  <input 
+                    className="input input-bordered w-full focus:border-primary focus:ring-1 focus:ring-primary transition-all" 
+                    value={formData.location}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                    placeholder="City, Country"
+                  />
+                </div>
+
+                <button onClick={handleSave} className="btn btn-primary w-full gap-2 mt-2 shadow-md active:scale-[0.98]">
                   <Save className="size-4" /> Save Changes
                 </button>
               </div>
             ) : (
-              <div className="space-y-6">
+              
+              /* READ-ONLY MODE (DISPLAY) */
+              <div className="space-y-6 sm:space-y-8 w-full text-center md:text-left">
+                
+                {/* Name & Bio */}
                 <div>
-                  <h2 className="text-4xl font-bold text-white">{authUser.fullName}</h2>
-                  <p className="text-gray-400 mt-1">{authUser.bio || "No bio added"}</p>
+                  <h2 className="text-2xl sm:text-4xl font-bold text-base-content wrap-break-word">{authUser.fullName}</h2>
+                  <p className="text-base-content/70 mt-2 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto md:mx-0">
+                    {authUser.bio || <span className="italic opacity-50">No bio added. Click edit to add one.</span>}
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 bg-gray-800/40 p-4 rounded-xl border border-gray-700">
-                    <Mail className="size-5 text-primary" />
-                    <span className="text-gray-200">{authUser.email}</span>
+                {/* Contact & Location Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex items-center justify-center md:justify-start gap-3 bg-base-100 p-3 sm:p-4 rounded-xl border border-base-300 shadow-sm overflow-hidden">
+                    <Mail className="size-5 text-primary shrink-0" />
+                    <span className="text-base-content font-medium truncate">{authUser.email}</span>
                   </div>
-                  <div className="flex items-center gap-3 bg-gray-800/40 p-4 rounded-xl border border-gray-700">
-                    <MapPin className="size-5 text-primary" />
-                    <span className="text-gray-200">{authUser.location || "Location"}</span>
+                  <div className="flex items-center justify-center md:justify-start gap-3 bg-base-100 p-3 sm:p-4 rounded-xl border border-base-300 shadow-sm overflow-hidden">
+                    <MapPin className="size-5 text-primary shrink-0" />
+                    <span className="text-base-content font-medium truncate">{authUser.location || "Location not set"}</span>
                   </div>
                 </div>
+
+                {/* Languages Section (Restored) */}
+                <div className="pt-6 border-t border-base-300">
+                  <h3 className="text-sm font-bold text-base-content/60 uppercase tracking-widest mb-4">Language Preferences</h3>
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                    
+                    {/* Native Language */}
+                    <div className="flex-1 bg-secondary/10 border border-secondary/20 p-4 rounded-xl flex items-center gap-4">
+                      <span className="text-3xl drop-shadow-sm">{getFlag(authUser.nativeLanguage)}</span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] font-bold text-secondary uppercase tracking-wider">Native Language</span>
+                        <span className="text-base-content font-semibold truncate capitalize">{authUser.nativeLanguage || "N/A"}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Learning Language */}
+                    <div className="flex-1 bg-primary/10 border border-primary/20 p-4 rounded-xl flex items-center gap-4">
+                      <span className="text-3xl drop-shadow-sm">{getFlag(authUser.learningLanguage)}</span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Learning Language</span>
+                        <span className="text-base-content font-semibold truncate capitalize">{authUser.learningLanguage || "N/A"}</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
               </div>
             )}
           </div>

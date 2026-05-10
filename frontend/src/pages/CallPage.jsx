@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import useAuthUser from "../hooks/useAuthUser";
 import { useQuery } from "@tanstack/react-query";
@@ -38,34 +37,27 @@ const CallPage = () => {
 
   useEffect(() => {
     const initCall = async () => {
-      if (!tokenData.token || !authUser || !callId) return;
+      if (!tokenData?.token || !authUser || !callId) return;
 
       try {
-        console.log("Initializing Stream video client...");
-
-        const user = {
-          id: authUser._id,
-          name: authUser.fullName,
-          image: authUser.profilePic,
-        };
-
         const videoClient = new StreamVideoClient({
           apiKey: STREAM_API_KEY,
-          user,
+          user: {
+            id: authUser._id,
+            name: authUser.fullName,
+            image: authUser.profilePic,
+          },
           token: tokenData.token,
         });
 
         const callInstance = videoClient.call("default", callId);
-
         await callInstance.join({ create: true });
-
-        console.log("Joined call successfully");
 
         setClient(videoClient);
         setCall(callInstance);
       } catch (error) {
-        console.error("Error joining call:::::::", error);
-        toast.error("Could not join the call. Please try again.");
+        console.error("Error joining call:", error);
+        toast.error("Could not join the call.");
       } finally {
         setIsConnecting(false);
       }
@@ -77,8 +69,11 @@ const CallPage = () => {
   if (isLoading || isConnecting) return <PageLoader />;
 
   return (
-    <div className="h-screen flex flex-col items-center justify-center">
-      <div className="relative">
+    /* 1. min-h-[100dvh]: Mobile par browser bars ke beech me height fix rakhta hai.
+       2. bg-black: Video calls hamesha dark background par achhi lagti hain.
+    */
+    <div className="min-h-dvh w-full bg-[#101418] flex flex-col items-center justify-center overflow-hidden">
+      <div className="w-full h-full max-w-7xl mx-auto flex items-center justify-center p-2 sm:p-4">
         {client && call ? (
           <StreamVideo client={client}>
             <StreamCall call={call}>
@@ -86,8 +81,8 @@ const CallPage = () => {
             </StreamCall>
           </StreamVideo>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <p>Could not initialize call. Please refresh or try again later.</p>
+          <div className="text-center p-6 bg-base-200 rounded-2xl shadow-xl border border-base-300 mx-4">
+             <p className="text-base sm:text-lg opacity-80">Could not initialize call. Please refresh.</p>
           </div>
         )}
       </div>
@@ -98,15 +93,30 @@ const CallPage = () => {
 const CallContent = () => {
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
-
   const navigate = useNavigate();
 
-  if (callingState === CallingState.LEFT) return navigate("/");
+  useEffect(() => {
+    if (callingState === CallingState.LEFT) {
+       navigate("/");
+    }
+  }, [callingState, navigate]);
 
   return (
-    <StreamTheme>
-      <SpeakerLayout />
-      <CallControls />
+    /* 1. StreamTheme: Iska default mode 'dark' hai.
+       2. str-video__call-container: Is class ko height full deni hogi taaki layout pichke na.
+    */
+    <StreamTheme className="w-full h-full flex flex-col relative">
+      <div className="flex-1 w-full h-full rounded-xl overflow-hidden shadow-2xl relative">
+        {/* SpeakerLayout automatically grid adjust karta hai mobile ke liye */}
+        <SpeakerLayout participantsBarPosition="bottom" />
+        
+        {/* Controls Overlay: Niche float karenge aur mobile par adjust honge */}
+        <div className="absolute bottom-4 left-0 right-0 z-50 px-2">
+            <div className="max-w-fit mx-auto scale-90 sm:scale-100">
+               <CallControls onLeave={() => navigate("/")} />
+            </div>
+        </div>
+      </div>
     </StreamTheme>
   );
 };
